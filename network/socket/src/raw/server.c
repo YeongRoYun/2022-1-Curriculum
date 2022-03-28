@@ -6,61 +6,67 @@
 #include<unistd.h>
 #include<stdio.h>
 
-#include"../header.h"
-
-#define SERVER_IP "192.168.0.3"
-#define SERVER_PORT 4000
-#define CLIENT_IP "192.168.0.3"
-#define CLIENT_PORT 3000
-#define SIZE 200
+#include "header.h"
 
 int main(int argc, char** argv){
 
-    int sd;
+    if(argc != 5) {
+        fprintf(stderr, "%s server_ipv4 server_port client_ipv4 client_port\n", argv[0]);
+        exit(1);
+    }
+    int server_sd;
     int on = 1;
-    
-    struct sockaddr_in client_addr, server_addr;
+    const char* server_ip = argv[1];
+    uint16_t server_port = atoi(argv[2]);
+    const char* client_ip = argv[3];
+    uint16_t client_port = atoi(argv[4]);
+    socklen_t addr_len = sizeof(struct sockaddr);
+    struct sockaddr_in server_addr, client_addr;
     struct tcp_header tcph;
     struct ip_header iph;
     struct pseudo_header psdh;
-    uint16_t* tmph;
-    uint8_t* buffer;
-    
-    size_t sent_len;
     size_t iph_len = sizeof(struct ip_header);
     size_t tcph_len = sizeof(struct tcp_header);
     size_t psdh_len = sizeof(struct pseudo_header);
-    socklen_t addr_len = sizeof(struct sockaddr);
+    uint16_t* tmph;
+    uint8_t* buffer;
+
+
+    if((server_sd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
+        perror("Error: create socket\n");
+        exit(1);
+    }
+
+    if(setsockopt(server_sd, IPPROTO_IP, IP_HDRINCL, &on, sizeof(on)) < 0) {
+		perror("Error: set sockopt\n");
+        exit(1);
+	}
+    
+    memset(&server_addr, 0, addr_len);
+    if(inet_pton(AF_INET, server_ip, &server_addr.sin_addr) < 0) {
+        perror("Error: convert server IP\n");
+        exit(1);
+    }
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(server_port);
+
+    if(bind(server_sd, (struct sockaddr*) &server_addr, addr_len) < 0) {
+        perror("Error: bind address\n");
+        exit(1);
+    }
 
     memset(&client_addr, 0, addr_len);
-    memset(&server_addr, 0, addr_len);
+    if(inet_pton(AF_INET, client_ip, &client_addr.sin_addr) < 0) {
+        perror("Error: convert client IPt\n");
+        exit(1);
+    }
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_port = htons(client_port);  
+    
     memset(&iph, 0, iph_len);
     memset(&tcph, 0, tcph_len);
     memset(&psdh, 0, psdh_len);
 
-    if((sd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
-        perror("Error: socket\n");
-        exit(1);
-    }
-
-    if(setsockopt(sd, IPPROTO_IP, IP_HDRINCL, &on, sizeof(on)) < 0) {
-		printf("set socket option error\n");
-        exit(1);
-	}
-
-    inet_pton(AF_INET, CLIENT_IP, &client_addr.sin_addr);
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(CLIENT_PORT);
-    
-    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr);
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
-
-    if(bind(sd, (struct sockaddr*) &server_addr, addr_len) < 0){
-        perror("Error: bind\n");
-        exit(1);
-    }
-    
     iph.version = 4;
     iph.ihl = 5;
     iph.tos = 0;
@@ -110,16 +116,12 @@ int main(int argc, char** argv){
     memcpy(buffer+iph_len, &tcph, tcph_len);
 
     
-    while((sent_len = sendto(sd, buffer, iph_len+tcph_len, 0, (struct sockaddr*) &client_addr, addr_len)) >= 0);
-    if(sent_len < 0) {
-        perror("Error: send\n");
-        exit(1);
+    if(sendto(server_sd, buffer, iph_len+tcph_len, 0, (struct sockaddr*) &client_addr, addr_len) < 0){
+        perror("Error: send messages\n");
     }
-    
     free(buffer);
-    if(close(sd) < 0) {
-        perror("Error: exit socket at server");
-        exit(1);
-    }
+    printf("Success: send segment from server to client\n");
+
+    close(server_sd);
     return 0;
 }
