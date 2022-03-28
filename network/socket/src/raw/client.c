@@ -6,7 +6,7 @@
 #include<unistd.h>
 #include<stdio.h>
 
-#include"header.h"
+#include"../header.h"
 
 #define SERVER_IP "192.168.0.3"
 #define SERVER_PORT 4000
