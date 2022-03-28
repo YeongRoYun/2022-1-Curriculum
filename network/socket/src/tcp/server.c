@@ -6,72 +6,65 @@
 #include<string.h>
 #include<stdio.h>
 
-#define IP "192.168.0.3"
-#define PORT 3000
-
 int main(int argc, char** argv) {
 
-    int sd;
+    if(argc != 3) {
+        perror("%s my_ipv4 my_port\n");
+        exit(1);
+    }
+    char buffer[200];
+    int server_sd, client_sd;
+    const char* ip = argv[1];
+    uint16_t port = atoi(argv[2]);
+    socklen_t addr_len = sizeof(struct sockaddr);
+    struct sockaddr_in server_addr, client_addr;
+    
 
-    if( (sd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
+    if( (server_sd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
         perror("Error: create socket\n");
         exit(1);
     }
-    struct sockaddr_in server_addr;
-    memset((char*) &server_addr, '\0', sizeof(struct sockaddr_in));
-    if( inet_pton(AF_INET, IP, &server_addr.sin_addr) < 0 ) {
-        perror("Error: convert ip\n");
+    
+    memset(&server_addr, 0, addr_len);
+    if(inet_pton(AF_INET, ip, &server_addr.sin_addr) < 0) {
+        perror("Error: convert IP\n");
         exit(1);
     }
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = PORT;
-    server_addr.sin_len = sizeof(struct sockaddr_in);
+    server_addr.sin_port = htons(port);
 
-    if( bind(sd, (struct sockaddr*) &server_addr, server_addr.sin_len) < 0 ) {
+    if( bind(server_sd, (struct sockaddr*) &server_addr, addr_len) < 0 ) {
         perror("Error: bind address\n");
         exit(1);
     }
 
-    if( listen(sd, 3) < 0 ) {
+    if( listen(server_sd, 3) < 0 ) {
         perror("Error: listen requests\n");
         exit(1);
     }
-
-    int client_sd;
-    struct sockaddr_in client_addr;
-    socklen_t addr_len = sizeof(struct sockaddr);
-    while(1) {
-        if( (client_sd = accept(sd, (struct sockaddr*) &client_addr, &addr_len)) < 0 ) {
-            perror("disconnecting...\n");
-            continue;
-        }
-        else {
-            break;
-        }
-    }
-
-    const char* sent_msg = "From server to client";
-    int sent_len;
-    if( (sent_len = send(client_sd, sent_msg, strlen(sent_msg), 0)) < 0 ) {
-        perror("Error: send message at server\n");
+    
+    if((client_sd = accept(server_sd, (struct sockaddr*) &client_addr, &addr_len)) < 0) {
+        perror("Error: accept requests\n");
         exit(1);
     }
-    printf("Message from server to client\n");
-    printf("Total length: %d\n Total message: %s\n", sent_len, sent_msg);
-
-    char recieved_msg[200];
-    socklen_t recieved_len;
-    if( (recieved_len = recv(client_sd, recieved_msg, sizeof(recieved_msg), 0)) < 0 ) {
-        perror("Error: receive message at server\n");
+    
+    strcpy(buffer, "Good-morning");
+    if(send(client_sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error: send messagesr\n");
         exit(1);
     }
-    printf("Message from client to server\n");
-    printf("Total length: %d\n Total message: %s\n", recieved_len, recieved_msg);
+    printf("Success: send message from server to client\n");
 
-    if( (close(client_sd) < 0) && (close(sd) < 0) ) {
-        perror("Error: close socket\n");
+    
+    if(recv(client_sd, buffer, sizeof(buffer), 0) < 0) {
+        perror("Error: receive messages\n");
         exit(1);
     }
+    printf("Success: receive message from client to server\n");
+    printf("Message: %s\n", buffer);
+
+    close(client_sd);
+    close(server_sd);
 
     return 0;
 }
