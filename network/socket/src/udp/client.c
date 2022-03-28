@@ -6,58 +6,62 @@
 #include<string.h>
 #include<stdio.h>
 
-#define SERVER_IP "192.168.0.3"
-#define SERVER_PORT 4000
-#define CLIENT_IP "192.168.0.3"
-#define CLIENT_PORT 3000
-
 int main(int argc, char** argv) {
 
-    int sd;
-    struct sockaddr_in server_addr, client_addr;
-    socklen_t addr_len = sizeof(struct sockaddr);
-    char buf[200], msg[200];
-
-    if((sd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        perror("Error: create client socket at client\n");
+    if(argc != 5) {
+        fprintf(stderr, "%s server_ipv4 server_port client_ipv4 client_port\n", argv[0]);
         exit(1);
     }
-    memset(&client_addr, 0, sizeof(struct sockaddr_in));
-    if(inet_pton(AF_INET, CLIENT_IP, &client_addr.sin_addr) < 0) {
-        perror("Error: convert client ip at client\n");
+    char buffer[200];
+    int client_sd;
+    const char* server_ip = argv[1];
+    uint16_t server_port = atoi(argv[2]);
+    const char* client_ip = argv[3];
+    uint16_t client_port = atoi(argv[4]);
+    socklen_t addr_len = sizeof(struct sockaddr);
+    struct sockaddr_in server_addr, client_addr;
+
+    if((client_sd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        perror("Error: create socket\n");
+        exit(1);
+    }
+
+    memset(&client_addr, 0, addr_len);
+    if(inet_pton(AF_INET, client_ip, &client_addr.sin_addr) < 0) {
+        perror("Error: convert client IPt\n");
         exit(1);
     }
     client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(CLIENT_PORT);
+    client_addr.sin_port = htons(client_port);
 
-    if(bind(sd, (struct sockaddr*) &client_addr, addr_len) < 0) {
-        perror("Error: bind server at server");
+    if(bind(client_sd, (struct sockaddr*) &client_addr, addr_len) < 0) {
+        perror("Error: bind address\n");
         exit(1);
     }
 
-    memset(&server_addr, 0, sizeof(struct sockaddr_in));
-    if(inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) < 0) {
-        perror("Error: convert server ip at client\n");
+    memset(&server_addr, 0, addr_len);
+    if(inet_pton(AF_INET, server_ip, &server_addr.sin_addr) < 0) {
+        perror("Error: convert server IP\n");
         exit(1);
     }
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
+    server_addr.sin_port = htons(server_port);
 
-    recvfrom(sd, buf, sizeof(buf), 0, (struct sockaddr*) &server_addr, &addr_len);
+    if(recvfrom(client_sd, buffer, sizeof(buffer), 0, (struct sockaddr*) &server_addr, &addr_len) < 0){
+        perror("Error: receive messages\n");
+        exit(1);
+    }
     printf("Success: receive message from server to client\n");
-    printf("Message: %s\n", buf);
+    printf("Message: %s\n", buffer);
 
-    strcpy(msg, "From client to server");
-    if(sendto(sd, msg, strlen(msg), 0, (struct sockaddr*) &server_addr, addr_len) < 0){
-        perror("Error: send at client\n");
+    strcpy(buffer, "Good-night");
+    if(sendto(client_sd, buffer, sizeof(buffer), 0, (struct sockaddr*) &server_addr, addr_len) < 0){
+        perror("Error: send messages\n");
         exit(1);
     }
     printf("Success: send message from client to server\n");
 
-    if(close(sd) < 0) {
-        perror("Error: exit socket at server");
-        exit(1);
-    }
+    close(client_sd);
 
     return 0;
 }

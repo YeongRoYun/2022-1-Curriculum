@@ -9,13 +9,13 @@
 int main(int argc, char** argv) {
 
     if(argc != 3) {
-        perror("%s my_ipv4 my_port\n");
+        fprintf(stderr, "%s server_ipv4 server_port\n", argv[0]);
         exit(1);
     }
     char buffer[200];
     int server_sd, client_sd;
-    const char* ip = argv[1];
-    uint16_t port = atoi(argv[2]);
+    const char* server_ip = argv[1];
+    uint16_t server_port = atoi(argv[2]);
     socklen_t addr_len = sizeof(struct sockaddr);
     struct sockaddr_in server_addr, client_addr;
     
@@ -26,12 +26,12 @@ int main(int argc, char** argv) {
     }
     
     memset(&server_addr, 0, addr_len);
-    if(inet_pton(AF_INET, ip, &server_addr.sin_addr) < 0) {
-        perror("Error: convert IP\n");
+    if(inet_pton(AF_INET, server_ip, &server_addr.sin_addr) < 0) {
+        perror("Error: convert server IP\n");
         exit(1);
     }
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
+    server_addr.sin_port = htons(server_port);
 
     if( bind(server_sd, (struct sockaddr*) &server_addr, addr_len) < 0 ) {
         perror("Error: bind address\n");
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     
     strcpy(buffer, "Good-morning");
     if(send(client_sd, buffer, sizeof(buffer), 0) < 0) {
-        perror("Error: send messagesr\n");
+        perror("Error: send messages\n");
         exit(1);
     }
     printf("Success: send message from server to client\n");

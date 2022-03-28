@@ -9,7 +9,7 @@
 int main(int argc, char** argv) {
     
     if(argc != 3) {
-        perror("%s server_ipv4 server_port\n");
+        fprintf(stderr, "%s server_ipv4 server_port\n", argv[0]);
         exit(1);
     }
     char buffer[200];
