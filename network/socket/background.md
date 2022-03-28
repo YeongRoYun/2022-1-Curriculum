@@ -1,48 +1,72 @@
-/////////////////////////
-//Socket Address Structures
+# Socket
 
-//Used to specify who it communicates
-//IP address and Port must be network byte order
+### Why use?
+> used to specify endhost
 
-//<sys/socket.h>
-struct sockaddr {
-__uint8_t       sa_len;         //IP address + Port length, not require POSIX
-sa_family_t     sa_family;      //address family
-char            sa_data[14];    //IP address + Port
-};                              
+### Be careful
+> IP address and Port must be network byte order(MSB, human readable)
 
-//<netinet/in.h>
-//Used when AF_INET                 
-struct sockaddr_in {            
-	__uint8_t       sin_len;    //same as sa_len
-	sa_family_t     sin_family; //AF_INET(IPv4)
-	in_port_t       sin_port;   //2bytes, network byte order
-	struct  in_addr sin_addr;   //4bytes, Ip address
-	char            sin_zero[8];//dummy, all zeros
-};
+### functions
 
-//<sys/un.h>
-//Used when AF_UNIX
-struct  sockaddr_un {
-	unsigned char   sun_len;        //the length of path
-	sa_family_t     sun_family;     //AF_UNIX
-	char            sun_path[104];  //Path Name(socket name)
-};
+1. Socket address
+   1. Address Families
+      1. AF_INET: Address Family for IPv4
+      2. AF_INET6: Address Family for IPv6
+      3. AF_UNIX: Address Family for Local
+   2. base
+	```
+	<sys/socket.h>
+	struct sockaddr {
+	__uint8_t       sa_len;         //IP address + Port length, not require on POSIX
+	sa_family_t     sa_family;      //address family
+	char            sa_data[14];    //IP address + Port
+	};                              
+	```
+   3. internet
+	 ```
+	 <netinet/in.h>
+	//Used with AF_INET                 
+	struct sockaddr_in {            
+		__uint8_t       sin_len;    //same as sa_len
+		sa_family_t     sin_family; //AF_INET(IPv4)
+		in_port_t       sin_port;   //2bytes, network byte order
+		struct  in_addr sin_addr;   //4bytes, Ip address
+		char            sin_zero[8];//dummy, all zeros
+	};
+	```
+    4. local
+	```   
+	//<sys/un.h>
+	//Used when AF_UNIX
+	struct  sockaddr_un {
+		unsigned char   sun_len;        //the length of path
+		sa_family_t     sun_family;     //AF_UNIX
+		char            sun_path[104];  //Path Name(socket name)
+	};
+	```
 
-//Address Family
-//AF_INET: Address Family for IPv4
-//AF_INET6: Address Family for IPv6
-//AF_UNIX: Address Family for Local
 
-//ntoh(s/l), hton(s/l): -s for port, -l for address
+2. Changing data for networking
+    1. byte order
+       ```
+       <arpa/inet.h>
+       short ntohs(short x);
+       short htons(short x);
+       long ntohs(long x);
+       long htons(long x);
+       ```
+       - -s for port, -l for ip address
+    2. ip address string to binary(NBO)
+       ```
+       <arapa/inet.h>
+       int inet_pton(int af, const char *src, void *dst);
+       ```
+       - af: AF_INET or AF_INET6
+       - src: Ip address
+       - dst: For binary, network byte order
+       - return: 1=true
 
-//<arapa/inet.h>
-//Convert ip address(only base 10!) to binary
-int inet_pton(int af, const char *src, void *dst);
-//af: AF_INET or AF_INET6
-//src: Ip address
-//dst: For binary, network byte order
-//return: 1=true
+
 
 //<sys/socket.h>
 //Create socket descriptor
