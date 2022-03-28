@@ -49,21 +49,24 @@
 2. Changing data for networking
     1. byte order
        ```
+       <arpa/inet.h>
        short ntohs(short x);
        short htons(short x);
        long ntohs(long x);
        long htons(long x);
        ```
        - -s for port, -l for ip address
-    4. 
+    2. ip address string to binary(NBO)
+       ```
+       <arapa/inet.h>
+       int inet_pton(int af, const char *src, void *dst);
+       ```
+       - af: AF_INET or AF_INET6
+       - src: Ip address
+       - dst: For binary, network byte order
+       - return: 1=true
 
-//<arapa/inet.h>
-//Convert ip address(only base 10!) to binary
-int inet_pton(int af, const char *src, void *dst);
-//af: AF_INET or AF_INET6
-//src: Ip address
-//dst: For binary, network byte order
-//return: 1=true
+
 
 //<sys/socket.h>
 //Create socket descriptor
