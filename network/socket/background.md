@@ -95,25 +95,29 @@
    2. Allocate address to socket
       ```
       <sys/socket.h>
-      int bind(int s, const struct sockaddr* name, int namelen);
+      int bind(int s, const struct sockaddr* addr, int addrlen);
       ```
-      - 
-////////////////////////////////////////////////////////
-//For server
-//<sys/socket.h>
-//Allocate address to socket
-int bind(int s, const struct sockaddr *name, int namelen);
-//s: socket descriptor
-//name: sockaddr allocated to s
-//namelen: sizeof name(len is read)
-//return: 0=true
-
-//<sys/socket.h>
-//Create ready queue for clients
-int listen(int s, int backlog);
-//s: socket descriptor
-//backlog: size of queue
-//return: 0=true
+      - s: socket descriptor
+      - addr: sockaddr allocated to s
+      - addrlen: sizeof(struct sockaddr)
+      - return < 0 is falure, else return 0
+      
+   3. Create listen queue in server
+      ```
+      <sys/socket.h>
+      int listen(int s, int backlog);
+      ```
+      - s: socket descriptor
+      - backlog: sizeof(queue)
+      - return < 0 is falure, else return 0
+      - Requests after the queue is full are discarded
+      
+   4. Accept a request of client in server
+      ```
+      <sys/socket.h>
+      int accept(int s, struct sockaddr* addr, socketlen_t* addrlen);
+      ```
+      
 
 
 //<sys/socket.h>
