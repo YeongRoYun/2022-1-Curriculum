@@ -21,6 +21,7 @@ int main(int argc, char** argv){
     uint16_t client_port = atoi(argv[4]);
     socklen_t addr_len = sizeof(struct sockaddr);
     struct sockaddr_in server_addr, client_addr;
+    struct ip_header iph;
     struct tcp_header tcph;
     size_t tcph_len = sizeof(struct tcp_header);
     uint8_t* buffer;
@@ -52,12 +53,19 @@ int main(int argc, char** argv){
     server_addr.sin_port = htons(server_port);
 
     buffer = (uint8_t *)malloc(50);
-    if(recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len) < 0){
+    int len;
+    if((len = recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len)) < 0){
         perror("Error: receive messages\n");
         exit(1);
     }
     printf("Success: receive segment from server to client\n");
-    printf("message: %s\n", buffer+40);
+    printf("length : %d\n", len);
+
+    memcpy(&iph, buffer, sizeof(iph));
+    memcpy(&tcph, buffer+sizeof(iph), sizeof(tcph));
+    
+    printf("ip header info\n");
+    printf("version: %d\n", ntohs(iph.version));
 
     close(client_sd);
 
