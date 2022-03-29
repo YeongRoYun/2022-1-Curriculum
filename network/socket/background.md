@@ -161,35 +161,28 @@
              - peek at incoming message
            - MSG_WAITALL
              - wait for full request or error
-         - return < 0 is failure, else return the size of recv/write bytes
-         
-	 ```
-	 
-	 ```
+         - return < 0 is failure, else return the size of recv/send bytes
+    
+       2. Unnecessary connecting hosts
+       
+          ```
+	  <sys/socket.h>
+	  int recvfrom(int s, void* buf, size_t nbytes, int flags, const struct sockaddr* src_addr, socklen_t* addrlen);
+	  int sendto(int s, const void* buf, size_t nbytes, int flags, const struct sockaddr* dest_addr, socklen_t addrlen);
+	  ```
+	  - src_addr: communication isn't connection-oriented and src_addr isn't null, on return, it filled with src_addr
+	  - addrlen in recvfrom is passed initially as sizeof(src_addr). on return, it filled with actual sizeof(src_addr)
+	  - dest_addr: must specify dest_addr
+	  - return < 0 is failure, else return the size of recvfrom/sendto bytes
 
-////////////////////////////////////////////////////////
-//For both
-//<unistd.h>
-int close(int fd);
-//return: 0=true, -1=false
-
-//<sys/socket.h>
-//Send/Receive messages in UDP mainly
-int sendto(int s, const void* msg, size_t len, int flags, const struct sockaddr* dest_addr, socklen_t addrlen);
-int recvfrom(int s, const void* buf, size_t len, int flags, const struct sockaddr* src_addr, socklen_t* addrlen);
-//dest_addr: destination address
-//len of sendto is read
-//src_addr: source address
-//len of recvfrom is written
-//return: the size of bytes = success/ -1 = fail
-
-//     MSG_DONTWAIT     ||    MSG_NOSIGNAL
-//if waiting, return -1 || if disconnected, don't receive SIGPIPE
-
-////////////////////////////////////////////////////////
+   7. Close socket
+      ```
+      <unistd.h>
+      int close(int fd);
+      ```
+      - return < 0 is failure, else return 0
 
 
-////////////////////////////////////////////////////////
 //TCP communications
 //server: socket() -> bind() -> listen() -> accept() -> read/write() -> close()
 //client: socket() -> connect() -> read/write() -> close()
