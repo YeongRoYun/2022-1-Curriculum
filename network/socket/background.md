@@ -109,8 +109,8 @@
       ```
       - s: socket descriptor
       - backlog: sizeof(queue)
-      - return < 0 is falure, else return 0
-      - Requests after the queue is full are discarded
+      - return < 0 is failure, else return 0
+      - requests after the queue is full are discarded
       
    4. Accept a request of client in server
       ```
@@ -120,41 +120,41 @@
       - s: socket descriptor
       - addr: filled with the client address if successing
       - addrlen: initially contain the amount of space pointed to by address, on return it will contain the actual length(in bytes) of the address returned
-
-//<sys/socket.h>
-//Accept a client and return descriptor for communication
-int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
-//s: socket descriptor
-//addr: client address info. pass empty addr and get it
-// addrlen: point of a sockaddr size(len is written)
-//return: connected socket descriptor, use this to communicate a client!
-
-////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////
-//For client
-//<sys/socket.h>
-//Connect server
-int connect(int s, struct sockaddr* serv_addr, int addrlen);
-//s: client socket descriptor
-//serve_addr: server addr info. pass perfect info
-//addrlen: size of sockaddr
-//return: 0=true
-////////////////////////////////////////////////////////
-
+      - return < 0 is failure, else return sock descriptor for communicating a client
+   
+   5. Connect with server
+      ```
+      <sys/socket.h>
+      int connect(int s, struct sockaddr* addr, int addrlen);
+      ```
+      - s: socket descriptor
+      - addr: server address information
+      - addrlen: sizeof(addr)
+      - return < 0 is failure
+   
+   6. Send/Receive messages
+      1. Necessary connecting hosts
+      
+	 ```
+	 <unistd.h>
+	 size_t read(int fd, const void* buf, size_t nbytes);
+	 size_t write(int fd, void* buf, size_t nbytes);
+	 ```
+	 - fd: file/socket descriptor
+	 - buf: read/write buffer
+	 - nbytes: sizeof(buffer)
+	 - return < 0 is failure, else return the size of read/write bytes
+	 
+	 ```
+	 <sys/socket.h>
+	 int recv(int s, void* buf, 
+	 ```
 
 ////////////////////////////////////////////////////////
 //For both
 //<unistd.h>
 int close(int fd);
 //return: 0=true, -1=false
-
-//<unistd.h>
-size_t write(int fd, const void* msg, size_t nbytes);
-size_t read(int fd, void* buf, size_t nbytes);
-//fd: sender/receiver descriptor
-//return: the size of bytes = success/ -1 = fail
-
 
 //<sys/socket.h>
 //Send/Receive messages in TCP mainly
