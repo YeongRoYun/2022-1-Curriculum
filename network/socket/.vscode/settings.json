@@ -2,6 +2,10 @@
     "files.associations": {
         "tcp.h": "c",
         "ip.h": "c",
-        "header.h": "c"
+        "header.h": "c",
+        "if_ether.h": "c",
+        "unistd.h": "c",
+        "in.h": "c",
+        "ip_icmp.h": "c"
     }
 }

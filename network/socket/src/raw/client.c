@@ -6,68 +6,39 @@
 #include<unistd.h>
 #include<stdio.h>
 
-#include"header.h"
-
-int main(int argc, char** argv){
-
-    if(argc != 5) {
-        fprintf(stderr, "%s server_ipv4 server_port client_ipv4 client_port\n", argv[0]);
+int main(int argc, char** argv) {
+    
+    if(argc != 3) {
+        fprintf(stderr, "%s server_ipv4 server_port\n", argv[0]);
         exit(1);
     }
-    int client_sd;
-    const char* server_ip = argv[1];
-    uint16_t server_port = atoi(argv[2]);
-    const char* client_ip = argv[3];
-    uint16_t client_port = atoi(argv[4]);
+    char buffer[200];
+    int sd;
+    const char* ip = argv[1];
+    uint16_t port = atoi(argv[2]);
     socklen_t addr_len = sizeof(struct sockaddr);
-    struct sockaddr_in server_addr, client_addr;
-    struct ip_header iph;
-    struct tcp_header tcph;
-    size_t tcph_len = sizeof(struct tcp_header);
+    struct sockaddr_in server_addr;
+    
+    int sd, len;
+    struct sockaddr_in addr;
+    socklen_t addr_len = sizeof(addr);
     uint8_t* buffer;
+
+    sd = socket(AF_INET, SOCK_RAW, 13);
     
-    if((client_sd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
-        perror("Error: create socket\n");
-        exit(1);
-    }
-
-    memset(&client_addr, 0, addr_len);
-    if(inet_pton(AF_INET, client_ip, &client_addr.sin_addr) < 0) {
-        perror("Error: convert client IPt\n");
-        exit(1);
-    }
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(client_port);
+    memset(&addr, 0, sizeof(addr));
+    inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+    addr.sin_family = AF_INET;
+    addr.sin_port = 0;
     
-    if(bind(client_sd, (struct sockaddr*) &client_addr, addr_len) < 0) {
-        perror("Error: bind address\n");
-        exit(1);
-    }
+    buffer = (uint8_t*)malloc(200);
 
-    memset(&server_addr, 0, addr_len);
-    if(inet_pton(AF_INET, server_ip, &server_addr.sin_addr) < 0) {
-        perror("Error: convert server IP\n");
-        exit(1);
-    }
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(server_port);
-
-    buffer = (uint8_t *)malloc(50);
-    int len;
-    if((len = recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len)) < 0){
-        perror("Error: receive messages\n");
-        exit(1);
-    }
-    printf("Success: receive segment from server to client\n");
-    printf("length : %d\n", len);
-
-    memcpy(&tcph, buffer, sizeof(tcph));
-    
-    printf("tcp header info\n");
-    printf("src: %d\n", ntohs(tcph.source));
-    printf("dest: %d\n", ntohs(tcph.dest));
-
-    close(client_sd);
-
+    len = recvfrom(sd, buffer, 200, 0, (struct sockaddr*) &addr, &addr_len);
+    printf("len: %d\n", len);
+    for(int i = 0; i < len; ++i)
+        printf("%02X ", buffer[i]);
+    for(int i = 20; i < 24; ++i)
+        printf("%c", buffer[i]);
+    close(sd);
     return 0;
 }
