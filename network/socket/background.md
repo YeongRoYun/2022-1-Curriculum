@@ -83,7 +83,7 @@
         - SOCK_DGRAM: datagrams (connectionless, unreliable messages of a fixed (typically small) maximum length)
         - SOCK_RAW: Access to internal network protocols and interfaces
       
-      - protocol: protocols in domain
+      - (ip) protocol: protocols in domain
         - specifies a particular protocol to be used with the socket
         - 0 is automatic
         - AF_INET
@@ -208,19 +208,18 @@
       <sys/socket.h>
       int socket(domain, AF_RAW, protocol);
       '''
-      - protocol: indicate what protocol is handled manually
-        
+      - protocol
 	```
 	<netinet/in.h>
 	```
-        - IPPROTO_TCP: handle tcp header manually
-        - IPPROTO_UDP: handle udp header manually
-        - IPPROTO_ICMP: handle ICMP header manually
-        -  
+	
+        * reference(https://www.ibm.com/docs/en/i/7.4?topic=ssw_ibm_i_74/apis/socket.htm#HDRSCKUS)
+	* protocol number can be any except for IPPROTO_TCP and IPPROTO_UDP
+	* Each raw socket is associated with one IP protocol number, and receives all data for that protocol.
+	* 0 (IPPROTO_IP) is specified, IP sends all data received from all the protocol numbers except IPPROTO_TCP and IPPROTO_UDP.
+	* 255 (IPPROTO_RAW) is specified, a user must ensure that the IP header data is included in th data sent out on an output operation 
    
    
-   When the socket type is SOCK_RAW, you can specify any protocol number between 0-255. Two exceptions are the IPPROTO_TCP and IPPROTO_UDP protocols, which cannot be specified on a socket type of SOCK_RAW (if you issue socket(), you get an error with an error code of [EPROTONOSUPPORT]). Each raw socket is associated with one IP protocol number, and receives all data for that protocol. For example, if two processes create a raw socket with the same protocol number, and data is received for the protocol, then both processes get copies of the data.
-Protocol numbers 0 (IPPROTO_IP) and 255 (IPPROTO_RAW) have some unique characteristics. If a protocol number of zero is specified, then IP sends all data received from all the protocol numbers (except IPPROTO_TCP and IPPROTO_UDP protocols). If a protocol number of 255 is specified, a user must ensure that the IP header data is included in the data sent out on an output operation.
    2. asdf
 
 //<sys/socket.h>
