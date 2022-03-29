@@ -99,7 +99,7 @@
       ```
       - s: socket descriptor
       - addr: sockaddr allocated to s
-      - addrlen: sizeof(struct sockaddr)
+      - addrlen: addrlen, usually sizeof(struct sockaddr)
       - return < 0 is falure, else return 0
       
    3. Create listen queue in server
@@ -117,8 +117,9 @@
       <sys/socket.h>
       int accept(int s, struct sockaddr* addr, socketlen_t* addrlen);
       ```
-      
-
+      - s: socket descriptor
+      - addr: filled with the client address if successing
+      - addrlen: initially contain the amount of space pointed to by address, on return it will contain the actual length(in bytes) of the address returned
 
 //<sys/socket.h>
 //Accept a client and return descriptor for communication
