@@ -67,15 +67,15 @@ int main(int argc, char** argv){
     memset(&tcph, 0, tcph_len);
     memset(&psdh, 0, psdh_len);
 
-    iph.version = (htons(4) >> 12);
-    iph.ihl = (htons(5) >> 12);
+    iph.version = 4;
+    iph.ihl = 5;
     iph.tos = 0;
     iph.totlen = htons(iph_len + tcph_len);
     iph.id = 0;
-    iph.flags = (htons(2) >> 13);
+    iph.flags = 2;
     iph.offset = 0;
-    iph.ttl = (htons(152) >> 8);
-    iph.protocol = (htons(IPPROTO_TCP) >> 8);
+    iph.ttl = 152;
+    iph.protocol = IPPROTO_TCP;
     iph.source = server_addr.sin_addr.s_addr;
     iph.dest = client_addr.sin_addr.s_addr;
     iph.checksum = 0;
@@ -85,8 +85,8 @@ int main(int argc, char** argv){
     tcph.source = server_addr.sin_port;
     tcph.dest = client_addr.sin_port;
     tcph.sequence = 0;
-    tcph.acknowledge = htonl(1);
-    tcph.offset = (htons(5) >> 12);
+    tcph.acknowledge = 1;
+    tcph.offset = 5;
     tcph.reserved = 0;
     tcph.urg = 0;
     tcph.ack = 0;
@@ -95,6 +95,35 @@ int main(int argc, char** argv){
     tcph.syn = 0;
     tcph.fin = 1;
     tcph.window = htons(512);
+
+    // iph.version = (htons(4) >> 12);
+    // iph.ihl = (htons(5) >> 12);
+    // iph.tos = 0;
+    // iph.totlen = htons(iph_len + tcph_len);
+    // iph.id = 0;
+    // iph.flags = (htons(2) >> 13);
+    // iph.offset = 0;
+    // iph.ttl = (htons(152) >> 8);
+    // iph.protocol = (htons(IPPROTO_TCP) >> 8);
+    // iph.source = server_addr.sin_addr.s_addr;
+    // iph.dest = client_addr.sin_addr.s_addr;
+    // iph.checksum = 0;
+    // iph.checksum = checksum((uint16_t*) &iph, iph_len);
+    
+
+    // tcph.source = server_addr.sin_port;
+    // tcph.dest = client_addr.sin_port;
+    // tcph.sequence = 0;
+    // tcph.acknowledge = htonl(1);
+    // tcph.offset = (htons(5) >> 12);
+    // tcph.reserved = 0;
+    // tcph.urg = 0;
+    // tcph.ack = 0;
+    // tcph.psh = 0;
+    // tcph.rst = 0;
+    // tcph.syn = 0;
+    // tcph.fin = 1;
+    // tcph.window = htons(512);
 
     psdh.source = iph.source;
     psdh.dest = iph.dest;
