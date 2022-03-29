@@ -32,7 +32,7 @@ int main(int argc, char** argv){
     uint8_t* buffer;
 
 
-    if((server_sd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
+    if((server_sd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
         perror("Error: create socket\n");
         exit(1);
     }
@@ -70,7 +70,7 @@ int main(int argc, char** argv){
     iph.version = 4;
     iph.ihl = 5;
     iph.tos = 0;
-    iph.totlen = htons(iph_len + tcph_len);
+    iph.totlen = iph_len + tcph_len;
     iph.id = 0;
     iph.flags = 2;
     iph.offset = 0;
