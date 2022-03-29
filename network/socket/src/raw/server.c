@@ -111,10 +111,11 @@ int main(int argc, char** argv){
     free(tmph);
 
     
-    buffer = (uint8_t*)malloc(iph_len + tcph_len);
+    const char* msg = "hello";
+    buffer = (uint8_t*)malloc(iph_len + tcph_len + 6);
     memcpy(buffer, &iph, iph_len);
     memcpy(buffer+iph_len, &tcph, tcph_len);
-
+    strcpy(buffer+iph_len+tcph_len, msg);
     
     if(sendto(server_sd, buffer, iph_len+tcph_len, 0, (struct sockaddr*) &client_addr, addr_len) < 0){
         perror("Error: send messages\n");

@@ -23,7 +23,7 @@ int main(int argc, char** argv){
     struct sockaddr_in server_addr, client_addr;
     struct tcp_header tcph;
     size_t tcph_len = sizeof(struct tcp_header);
-
+    uint8_t* buffer;
     
     if((client_sd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) < 0) {
         perror("Error: create socket\n");
@@ -51,12 +51,14 @@ int main(int argc, char** argv){
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(server_port);
 
-    if(recvfrom(client_sd, &tcph, tcph_len, 0, (struct sockaddr*) &server_addr, &addr_len) < 0){
+    buffer = (uint8_t *)malloc(50);
+    if(recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len) < 0){
         perror("Error: receive messages\n");
         exit(1);
     }
     printf("Success: receive segment from server to client\n");
-    
+    printf("message: %s\n", buffer+40);
+
     close(client_sd);
 
     return 0;
