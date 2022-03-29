@@ -73,25 +73,31 @@
       <sys/socket.h>
       int socket(int domain, int type, int protocol);
       ```
-      - domain: Address Families
+      - domain: a communications domain within which communication will take place(Address Families)
         - AF_INET: Ipv4
         - AF_INET6: Ipv6
         - AF_UNIX: Local
+      
       - type: Format of transfer
-        - SOCK_STREAM: TCP(streaming)
-        - SOCK_DGRAM: UDP(datagram)
-        - SOCK_RAW: Access 
+        - SOCK_STREAM: sequenced, reliable, two-way connection based byte streams
+        - SOCK_DGRAM: datagrams (connectionless, unreliable messages of a fixed (typically small) maximum length)
+        - SOCK_RAW: Access to internal network protocols and interfaces
+      
       - protocol: protocols in domain
+        - specifies a particular protocol to be used with the socket
         - 0 is automatic
-        - 
-//<sys/socket.h>
-//Create socket descriptor
-int socket(int domain, int type, int protocol);
-//domain: Address Families
-//type: format of data transferred, SOCK_STREAM, SOCK_DGRAM, SOCK_RAW
-//protocol: protocol in domain, 0 is automatic
-//return: -1=failure
-
+        - AF_INET
+          - IPPROTO_ICMP
+          - IPPROTO_TCP
+          - IPPROTO_UDP
+        - return -1 is failure, else return socket descriptor
+   
+   2. Allocate address to socket
+      ```
+      <sys/socket.h>
+      int bind(int s, const struct sockaddr* name, int namelen);
+      ```
+      - 
 ////////////////////////////////////////////////////////
 //For server
 //<sys/socket.h>
