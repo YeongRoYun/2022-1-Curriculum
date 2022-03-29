@@ -14,26 +14,26 @@
       2. AF_INET6: Address Family for IPv6
       3. AF_UNIX: Address Family for Local
    2. base
-	```
-	<sys/socket.h>
-	struct sockaddr {
-	__uint8_t       sa_len;         //IP address + Port length, not require on POSIX
-	sa_family_t     sa_family;      //address family
-	char            sa_data[14];    //IP address + Port
-	};                              
-	```
+      ```
+      <sys/socket.h>
+      struct sockaddr {
+      __uint8_t       sa_len;         //IP address + Port length, not require on POSIX
+      sa_family_t     sa_family;      //address family 
+      char            sa_data[14];    //IP address + Port
+      };                              
+      ```
    3. internet
-	 ```
-	 <netinet/in.h>
-	//Used with AF_INET                 
-	struct sockaddr_in {            
-		__uint8_t       sin_len;    //same as sa_len
-		sa_family_t     sin_family; //AF_INET(IPv4)
-		in_port_t       sin_port;   //2bytes, network byte order
-		struct  in_addr sin_addr;   //4bytes, Ip address
-		char            sin_zero[8];//dummy, all zeros
-	};
-	```
+      ```
+      <netinet/in.h>
+      //Used with AF_INET                 
+      struct sockaddr_in {            
+      __uint8_t       sin_len;    //same as sa_len
+      sa_family_t     sin_family; //AF_INET(IPv4)
+      in_port_t       sin_port;   //2bytes, network byte order
+      struct  in_addr sin_addr;   //4bytes, Ip address
+      char            sin_zero[8];//dummy, all zeros
+      };
+      ```
     4. local
 	```   
 	//<sys/un.h>
