@@ -52,7 +52,7 @@ int main(int argc, char** argv){
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(server_port);
 
-    buffer = (uint8_t *)malloc(40);
+    buffer = (uint8_t *)malloc(50);
     int len;
     if((len = recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len)) < 0){
         perror("Error: receive messages\n");
