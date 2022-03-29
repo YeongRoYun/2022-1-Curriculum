@@ -137,8 +137,8 @@
       
 	 ```
 	 <unistd.h>
-	 size_t read(int fd, const void* buf, size_t nbytes);
-	 size_t write(int fd, void* buf, size_t nbytes);
+	 size_t read(int fd, void* buf, size_t nbytes);
+	 size_t write(int fd, const void* buf, size_t nbytes);
 	 ```
 	 - fd: file/socket descriptor
 	 - buf: read/write buffer
@@ -147,8 +147,14 @@
 	 
 	 ```
 	 <sys/socket.h>
-	 int recv(int s, void* buf, 
+	 int recv(int s, void* buf, size_t nbytes, int flags);
+	 int send(int s, const void* buf, size_t nbytes, int flags);
 	 ```
+	 - s: socket descriptor
+	 - buf: recv/send buffer
+	 - nbytes: sizeof(buffer)
+	 - flags
+	   - 
 
 ////////////////////////////////////////////////////////
 //For both
