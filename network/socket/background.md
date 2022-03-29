@@ -67,77 +67,111 @@
        - return: 1=true
 
 
-
-//<sys/socket.h>
-//Create socket descriptor
-int socket(int domain, int type, int protocol);
-//domain: Address Families
-//type: format of data transferred, SOCK_STREAM, SOCK_DGRAM, SOCK_RAW
-//protocol: protocol in domain, 0 is automatic
-//return: -1=failure
-
-////////////////////////////////////////////////////////
-//For server
-//<sys/socket.h>
-//Allocate address to socket
-int bind(int s, const struct sockaddr *name, int namelen);
-//s: socket descriptor
-//name: sockaddr allocated to s
-//namelen: sizeof name(len is read)
-//return: 0=true
-
-//<sys/socket.h>
-//Create ready queue for clients
-int listen(int s, int backlog);
-//s: socket descriptor
-//backlog: size of queue
-//return: 0=true
-
-
-//<sys/socket.h>
-//Accept a client and return descriptor for communication
-int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
-//s: socket descriptor
-//addr: client address info. pass empty addr and get it
-// addrlen: point of a sockaddr size(len is written)
-//return: connected socket descriptor, use this to communicate a client!
-
-////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////
-//For client
-//<sys/socket.h>
-//Connect server
-int connect(int s, struct sockaddr* serv_addr, int addrlen);
-//s: client socket descriptor
-//serve_addr: server addr info. pass perfect info
-//addrlen: size of sockaddr
-//return: 0=true
-////////////////////////////////////////////////////////
-
+3. Communication
+   1. create socket descriptor
+      ```
+      <sys/socket.h>
+      int socket(int domain, int type, int protocol);
+      ```
+      - domain: a communications domain within which communication will take place(Address Families)
+        - AF_INET: Ipv4
+        - AF_INET6: Ipv6
+        - AF_UNIX: Local
+      
+      - type: Format of transfer
+        - SOCK_STREAM: sequenced, reliable, two-way connection based byte streams
+        - SOCK_DGRAM: datagrams (connectionless, unreliable messages of a fixed (typically small) maximum length)
+        - SOCK_RAW: Access to internal network protocols and interfaces
+      
+      - protocol: protocols in domain
+        - specifies a particular protocol to be used with the socket
+        - 0 is automatic
+        - AF_INET
+          - IPPROTO_ICMP
+          - IPPROTO_TCP
+          - IPPROTO_UDP
+        - return -1 is failure, else return socket descriptor
+   
+   2. Allocate address to socket
+      ```
+      <sys/socket.h>
+      int bind(int s, const struct sockaddr* addr, int addrlen);
+      ```
+      - s: socket descriptor
+      - addr: sockaddr allocated to s
+      - addrlen: addrlen, usually sizeof(struct sockaddr)
+      - return < 0 is falure, else return 0
+      
+   3. Create listen queue in server
+      ```
+      <sys/socket.h>
+      int listen(int s, int backlog);
+      ```
+      - s: socket descriptor
+      - backlog: sizeof(queue)
+      - return < 0 is failure, else return 0
+      - requests after the queue is full are discarded
+      
+   4. Accept a request of client in server
+      ```
+      <sys/socket.h>
+      int accept(int s, struct sockaddr* addr, socketlen_t* addrlen);
+      ```
+      - s: socket descriptor
+      - addr: filled with the client address if successing
+      - addrlen: initially contain the amount of space pointed to by address, on return it will contain the actual length(in bytes) of the address returned
+      - return < 0 is failure, else return sock descriptor for communicating a client
+   
+   5. Connect with server
+      ```
+      <sys/socket.h>
+      int connect(int s, struct sockaddr* addr, int addrlen);
+      ```
+      - s: socket descriptor
+      - addr: server address information
+      - addrlen: sizeof(addr)
+      - return < 0 is failure
+   
+   6. Send/Receive messages
+      1. Necessary connecting hosts
+      
+	 ```
+	 <unistd.h>
+	 size_t read(int fd, void* buf, size_t nbytes);
+	 size_t write(int fd, const void* buf, size_t nbytes);
+	 ```
+	 - fd: file/socket descriptor
+	 - buf: read/write buffer
+	 - nbytes: sizeof(buffer)
+	 - return < 0 is failure, else return the size of read/write bytes
+	 
+	 ```
+	 <sys/socket.h>
+	 int recv(int s, void* buf, size_t nbytes, int flags);
+	 int send(int s, const void* buf, size_t nbytes, int flags);
+	 ```
+	 - s: socket descriptor
+	 - buf: recv/send buffer
+	 - nbytes: sizeof(buffer)
+	 - flags
+	   - MSG_OOB
+	     - process out-of-band data
+	     - 
+           - MSG_PEEK
+             - peek at incoming message
+           - MSG_WAITALL
+             - wait for full request or error
+         - return < 0 is failure, else return the size of recv/write bytes
+         
+	 ```
+	 
+	 ```
 
 ////////////////////////////////////////////////////////
 //For both
 //<unistd.h>
 int close(int fd);
 //return: 0=true, -1=false
-
-//<unistd.h>
-size_t write(int fd, const void* msg, size_t nbytes);
-size_t read(int fd, void* buf, size_t nbytes);
-//fd: sender/receiver descriptor
-//return: the size of bytes = success/ -1 = fail
-
-
-//<sys/socket.h>
-//Send/Receive messages in TCP mainly
-int send(int s, const void* msg, size_t len, int flags);
-int recv(int s, void* buf, size_t len, int flags);
-//s: sender/receiver socket descriptor
-//msg: messages
-//len: the size of messages
-//flags: option
-//return: the size of bytes = success/ -1 = fail
 
 //<sys/socket.h>
 //Send/Receive messages in UDP mainly
