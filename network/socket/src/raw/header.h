@@ -54,7 +54,7 @@ struct udp_header {
 };
 
 //RFC 793
-struct pseudo_header {
+struct pseuhdr {
     uint32_t source:        32; 
     uint32_t dest:          32; 
     uint8_t zero:            8;

@@ -24,14 +24,11 @@ int main(int argc, char** argv){
     uint16_t client_port = atoi(argv[4]);
     socklen_t addr_len = sizeof(struct sockaddr);
     struct sockaddr_in server_addr, client_addr;
-    struct tcphdr tcphdr;
-    struct ip iphdr;
-    struct pseudo_header psdh;
-    size_t iph_len = sizeof(struct ip);
-    size_t tcph_len = sizeof(struct tcphdr);
-    size_t psdh_len = sizeof(struct pseudo_header);
+    struct tcphdr* tcphdr;
+    struct ip* iphdr;
+    struct pseuhdr* pseuhdr;
     uint16_t* tmph;
-    uint8_t* buffer;
+    uint8_t* packet = (uint8_t*)malloc(40);
 
 
     if((server_sd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
@@ -65,53 +62,51 @@ int main(int argc, char** argv){
     client_addr.sin_family = AF_INET;
     client_addr.sin_port = htons(client_port);  
     
-    memset(&iphdr, 0, iph_len);
-    memset(&tcphdr, 0, tcph_len);
-    memset(&psdh, 0, psdh_len);
-
-    iphdr.ip_v = 4;
-    iphdr.ip_hl = 5;
-    iphdr.ip_tos = 0;
-    iphdr.ip_len = iph_len + tcph_len;
-    iphdr.ip_id = 0;
-    iphdr.ip_off = 0;
-    iphdr.ip_ttl = 152;
-    iphdr.ip_p = IPPROTO_TCP;
-    iphdr.ip_src = server_addr.sin_addr;
-    iphdr.ip_dst = client_addr.sin_addr;
-    iphdr.ip_sum = checksum((uint16_t*) &iphdr, iph_len);
-
-    tcphdr.th_sport = server_addr.sin_port;
-    tcphdr.th_dport = client_addr.sin_port;
-    tcphdr.th_seq = 0;
-    tcphdr.th_ack = 1;
-    tcphdr.th_off = 5;
-    tcphdr.th_flags = TH_FIN;
-    tcphdr.th_win = htons(512);
-    tcphdr.th_urp = 0;
+    memset(packet, 0, 40);
     
-    psdh.source = iphdr.ip_src.s_addr;
-    psdh.dest = iphdr.ip_dst.s_addr;
-    psdh.zero = 0;
-    psdh.protocol = iphdr.ip_p;
-    psdh.seglen = 20;
+    iphdr = (struct ip*) packet;
 
-    tmph = (uint16_t*)malloc(2*(psdh_len + tcph_len));
-    memset(tmph, 0, 2*(psdh_len+tcph_len));
-    memcpy(tmph, &psdh, psdh_len);
-    memcpy(tmph+psdh_len, &tcphdr, tcph_len);
-    tcphdr.th_sum = checksum(tmph, psdh_len + tcph_len);
+    iphdr->ip_v = 4;
+    iphdr->ip_hl = 5;
+    iphdr->ip_tos = 0;
+    iphdr->ip_len = 40;
+    iphdr->ip_id = 0;
+    iphdr->ip_off = 0;
+    iphdr->ip_ttl = 152;
+    iphdr->ip_p = IPPROTO_TCP;
+    iphdr->ip_src = server_addr.sin_addr;
+    iphdr->ip_dst = client_addr.sin_addr;
+    iphdr->ip_sum = checksum((uint16_t*) &iphdr, 20);
+
+    tcphdr = (struct tcphdr*) (packet + 20);
+
+    tcphdr->th_sport = server_addr.sin_port;
+    tcphdr->th_dport = client_addr.sin_port;
+    tcphdr->th_seq = 0;
+    tcphdr->th_ack = 1;
+    tcphdr->th_off = 5;
+    tcphdr->th_flags = TH_FIN;
+    tcphdr->th_win = htons(512);
+    tcphdr->th_urp = 0;
+    
+    pseuhdr = (struct pseuhdr*)malloc(sizeof(struct pseuhdr));
+    pseuhdr->source = iphdr->ip_src.s_addr;
+    pseuhdr->dest = iphdr->ip_dst.s_addr;
+    pseuhdr->zero = 0;
+    pseuhdr->protocol = iphdr->ip_p;
+    pseuhdr->seglen = 20;
+
+    tmph = (uint16_t*)malloc(2*(sizeof(pseuhdr) + 20));
+    memset(tmph, 0, 2*(sizeof(pseuhdr)+20));
+    memcpy(tmph, &pseuhdr, sizeof(pseuhdr));
+    memcpy(tmph+sizeof(pseuhdr), &tcphdr, 20);
+    tcphdr->th_sum = checksum(tmph, sizeof(pseuhdr) + 20);
     free(tmph);
-
     
-    buffer = (uint8_t*)malloc(iph_len + tcph_len);
-    memcpy(buffer, &iphdr, iph_len);
-    memcpy(buffer+iph_len, &tcphdr, tcph_len);
-    
-    if(sendto(server_sd, buffer, iph_len+tcph_len, 0, (struct sockaddr*) &client_addr, addr_len) < 0){
+    if(sendto(server_sd, packet, 40, 0, (struct sockaddr*) &client_addr, addr_len) < 0){
         perror("Error: send messages\n");
     }
-    free(buffer);
+    free(packet);
     printf("Success: send segment from server to client\n");
 
     close(server_sd);
