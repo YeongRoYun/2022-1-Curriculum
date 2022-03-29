@@ -96,7 +96,8 @@ int main(int argc, char** argv){
     psdh.protocol = iphdr.ip_p;
     psdh.seglen = 20;
 
-    tmph = (uint16_t*)malloc(psdh_len + tcph_len);
+    tmph = (uint16_t*)malloc(2*(psdh_len + tcph_len));
+    memset(tmph, 0, 2*(psdh_len+tcph_len));
     memcpy(tmph, &psdh, psdh_len);
     memcpy(tmph+psdh_len, &tcphdr, tcph_len);
     tcphdr.th_sum = checksum(tmph, psdh_len + tcph_len);
