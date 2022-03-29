@@ -220,15 +220,4 @@
 	* 255 (IPPROTO_RAW) is specified, a user must ensure that the IP header data is included in th data sent out on an output operation 
    
    
-   2. asdf
-
-//<sys/socket.h>
-//get/set socket options
-int getsockopt(int  s, int level, int optname, void *optval, socklen_t *optlen);
-int setsockopt(int s, int  level,  int  optname,  const  void  *optval, socklen_t optlen);
-//s: socket
-//level: the level of socket(layer depth)
-//optname: the number of socket option
-//optval: opt buffer
-//optlen: opt buffer size
-////////////////////////////////////////////////////////
+   2. 
