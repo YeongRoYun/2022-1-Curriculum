@@ -32,7 +32,7 @@ struct tcp_header {
     uint32_t sequence:      32;
     uint32_t acknowledge:   32;
     uint8_t offset:          4;
-    uint16_t reserved:       4;
+    uint16_t reserved:       6;
     uint8_t urg:             1;
     uint8_t ack:             1;
     uint8_t psh:             1;
