@@ -52,7 +52,7 @@ int main(int argc, char** argv){
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(server_port);
 
-    buffer = (uint8_t *)malloc(50);
+    buffer = (uint8_t *)malloc(20);
     int len;
     if((len = recvfrom(client_sd, buffer, 50, 0, (struct sockaddr*) &server_addr, &addr_len)) < 0){
         perror("Error: receive messages\n");
@@ -61,11 +61,11 @@ int main(int argc, char** argv){
     printf("Success: receive segment from server to client\n");
     printf("length : %d\n", len);
 
-    memcpy(&iph, buffer, sizeof(iph));
-    memcpy(&tcph, buffer+sizeof(iph), sizeof(tcph));
+    memcpy(&tcph, buffer, sizeof(tcph));
     
-    printf("ip header info\n");
-    printf("version: %d\n", iph.version);
+    printf("tcp header info\n");
+    printf("src: %d\n", ntohs(tcph.source));
+    printf("dest: %d\n", ntohs(tcph.dest));
 
     close(client_sd);
 
