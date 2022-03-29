@@ -154,23 +154,24 @@
 	 - buf: recv/send buffer
 	 - nbytes: sizeof(buffer)
 	 - flags
-	   - 
+	   - MSG_OOB
+	     - process out-of-band data
+	     - 
+           - MSG_PEEK
+             - peek at incoming message
+           - MSG_WAITALL
+             - wait for full request or error
+         - return < 0 is failure, else return the size of recv/write bytes
+         
+	 ```
+	 
+	 ```
 
 ////////////////////////////////////////////////////////
 //For both
 //<unistd.h>
 int close(int fd);
 //return: 0=true, -1=false
-
-//<sys/socket.h>
-//Send/Receive messages in TCP mainly
-int send(int s, const void* msg, size_t len, int flags);
-int recv(int s, void* buf, size_t len, int flags);
-//s: sender/receiver socket descriptor
-//msg: messages
-//len: the size of messages
-//flags: option
-//return: the size of bytes = success/ -1 = fail
 
 //<sys/socket.h>
 //Send/Receive messages in UDP mainly
