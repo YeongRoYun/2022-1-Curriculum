@@ -67,7 +67,23 @@
        - return: 1=true
 
 
-
+3. Communication
+   1. create socket descriptor
+      ```
+      <sys/socket.h>
+      int socket(int domain, int type, int protocol);
+      ```
+      - domain: Address Families
+        - AF_INET: Ipv4
+        - AF_INET6: Ipv6
+        - AF_UNIX: Local
+      - type: Format of transfer
+        - SOCK_STREAM: TCP(streaming)
+        - SOCK_DGRAM: UDP(datagram)
+        - SOCK_RAW: Access 
+      - protocol: protocols in domain
+        - 0 is automatic
+        - 
 //<sys/socket.h>
 //Create socket descriptor
 int socket(int domain, int type, int protocol);
