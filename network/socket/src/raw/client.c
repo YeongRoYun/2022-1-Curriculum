@@ -65,7 +65,7 @@ int main(int argc, char** argv){
     memcpy(&tcph, buffer+sizeof(iph), sizeof(tcph));
     
     printf("ip header info\n");
-    printf("version: %d\n", ntohs(iph.version));
+    printf("version: %d\n", iph.version);
 
     close(client_sd);
 
