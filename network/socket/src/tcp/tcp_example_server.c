@@ -61,7 +61,7 @@ int main(int argc, char * argv[]) {
 	}
 
 	while(1) {
-		connfd = connect(sockfd, (struct sockaddr*) &peer_addr, peer_addr_len);// Accept a connection request from a client
+		connfd = accept(sockfd, (struct sockaddr*) &peer_addr, &peer_addr_len);// Accept a connection request from a client
 		if(connfd < 0) {
 			printf("Accept Error\n");
 			break;
