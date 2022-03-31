@@ -24,7 +24,7 @@ int main(int argc, char * argv[]) {
 
 	memset((char *)&server_addr, 0, sizeof(server_addr));
 	
-	sockfd = sock(AF_INET, SOCK_RAW, 200);// Create socket
+	sockfd = socket(AF_INET, SOCK_RAW, 200);// Create socket
 
 	if(sockfd < 0) {
 		printf("Creating a socket failed\n");
