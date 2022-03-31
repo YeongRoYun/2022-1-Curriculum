@@ -29,16 +29,19 @@ int main(int argc, char * argv[]) {
 	memset((char *)&my_addr, 0, sizeof(my_addr));
 	
 	
-	sockfd = // Create socket
+	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
 	if(sockfd < 0) {
 		printf("Creating a socket failed\n");
 		return 0;
 	}
 	// Set up server_addr (struct sockaddr_in)
+	my_addr.sin_addr.s_addr = addr;
+	my_addr.sin_port = port;
+	my_addr.sin_family = AF_INET;
 
 	
-	err = // Bind (Local IP, Local port) to the socket
+	err = bind(sockfd, (struct sockaddr*) &my_addr, sizeof(my_addr));
 	if(err < 0) {
 		printf("Bind Error\n");
 		close(sockfd);
@@ -46,7 +49,7 @@ int main(int argc, char * argv[]) {
 		return 0;
 	}
 	
-	err = // Make the socket a listening socket.
+	err = listen(sockfd, 5);
 	if(err < 0) {
 		printf("Listen Error\n");
 		close(sockfd);
@@ -55,14 +58,14 @@ int main(int argc, char * argv[]) {
 	}
 
 	while(1) {
-		connfd = // Accept a connection request from a client
+		connfd = connect(sockfd, (struct sockaddr*) &peer_addr, peer_addr_len);// Accept a connection request from a client
 		if(connfd < 0) {
 			printf("Accept Error\n");
 			break;
 		}
 		printf("Connection Request from IP : %s, Port : %d has been accepted\n", inet_ntoa(peer_addr.sin_addr), ntohs(peer_addr.sin_port));
 		
-		data_len = // Receive a data from a client
+		data_len = recv(connfd, buf, sizeof(buf), 0);// Receive a data from a client
 		if(data_len < 0) {
 			printf("Receive Error\n");
 			break;
@@ -70,7 +73,7 @@ int main(int argc, char * argv[]) {
 		printf("Length : %d, Receiving : %s, ", data_len, buf);
 		printf("from IP : %s, Port : %d\n", inet_ntoa(peer_addr.sin_addr), ntohs(peer_addr.sin_port));
 		
-		data_len = // Reply to the client using Socket API
+		data_len = send(sockfd, buf, sizeof(buf), 0);// Reply to the client using Socket API
 		// Ex - Data - buf, Data len - data_len
 		if(data_len < 0) {
 			printf("Send Error\n");
@@ -79,5 +82,6 @@ int main(int argc, char * argv[]) {
 		close(connfd);
 	}
 	close(sockfd);
+	return 0;
 }
 

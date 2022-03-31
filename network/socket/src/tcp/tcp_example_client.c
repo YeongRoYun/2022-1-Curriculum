@@ -1,8 +1,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <string.h>
 #include <stdio.h>
-
 int main(int argc, char * argv[]) {
 	int sockfd;
 	struct sockaddr_in server_addr;
@@ -32,20 +32,22 @@ int main(int argc, char * argv[]) {
 	}
 
 	// Set up server_addr (struct sockaddr_in)
+	server_addr.sin_addr.s_addr = addr;
+	server_addr.sin_port = port;
+	server_addr.sin_family = AF_INET;
 	
-	
-	err = // Send a connection request to the server using Socket API
+	err = connect(sockfd, (struct sockaddr*) &server_addr, sizeof(server_addr));// Send a connection request to the server using Socket API
 
 	while(1) {
-		
-		data_len = // Send your Student ID to the server using Socket API
+		strcpy(buf, "2018320135");
+		data_len = send(sockfd, buf, strlen(buf) + 1, 0);// Send your Student ID to the server using Socket API
 		// Ex - Data - "2020010640", Data len - strlen("2020010640")+1
 		if(data_len < 0) {
 			printf("Send Error\n");
 			break;
 		}
 		
-		data_len = // Receive a reply from the server
+		data_len = recv(sockfd, buf, sizeof(buf), 0);// Receive a reply from the server
 		if(data_len < 0) {
 			printf("Receive Error\n");
 			break;
@@ -53,5 +55,6 @@ int main(int argc, char * argv[]) {
 		printf("Receiving : %s\n", buf);
 	}
 	close(sockfd);
+	return 0;
 }
 

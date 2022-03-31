@@ -31,15 +31,18 @@ int main(int argc, char * argv[]) {
 	memset((char *)&my_addr, 0, sizeof(my_addr));
 	
 	
-	sockfd = // Create socket
+	sockfd = socket(AF_INET, SOCK_DGRAM, 0);// Create socket
 
 	if(sockfd < 0) {
 		printf("Creating a socket failed\n");
 		return 0;
 	}
 	// Set up server_addr (struct sockaddr_in)
+	my_addr.sin_addr.s_addr = addr;
+	my_addr.sin_port = port;
+	my_addr.sin_family = AF_INET;
 
-	err = // Bind (Local IP, Local port) to the socket
+	err = bind(sockfd, (struct sockaddr*) &my_addr, sizeof(my_addr));// Bind (Local IP, Local port) to the socket
 	if(err < 0) {
 		printf("Bind Error\n");
 		close(sockfd);
@@ -49,7 +52,7 @@ int main(int argc, char * argv[]) {
 
 	while(1) {
 		
-		data_len = // Receive a data from a client
+		data_len = recvfrom(sockfd, buf, sizeof(buf), 0, (struct sockaddr*) &peer_addr, &peer_addr_len);// Receive a data from a client
 		// ?? (??, buf, 1000, 0, ??, ??)
 		if(data_len < 0) {
 			printf("Receiving Error\n");
@@ -58,7 +61,7 @@ int main(int argc, char * argv[]) {
 		printf("Length : %d, Receiving : %s ", data_len, buf);
 	        printf("From IP : %s, Port : %d\n", inet_ntoa(peer_addr.sin_addr), ntohs(peer_addr.sin_port));
 
-		data_len = // Reply to the client using Socket API
+		data_len = sendto(sockfd, buf, sizeof(buf), 0, (struct sockaddr*) &peer_addr, peer_addr_len);// Reply to the client using Socket API
 		// ?? (??, buf, data_len, 0, ??, ??)
 		if(data_len < 0) {
 			printf("Send Error\n");
@@ -66,5 +69,6 @@ int main(int argc, char * argv[]) {
 		}
 	}
 	close(sockfd);
+	return 0;
 }
 
