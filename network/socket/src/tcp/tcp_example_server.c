@@ -76,6 +76,7 @@ int main(int argc, char * argv[]) {
 		printf("Length : %d, Receiving : %s, ", data_len, buf);
 		printf("from IP : %s, Port : %d\n", inet_ntoa(peer_addr.sin_addr), ntohs(peer_addr.sin_port));
 		
+		strcpy(buf, "30 00 01 04 5");
 		data_len = send(sockfd, buf, strlen(buf) + 1, 0);// Reply to the client using Socket API
 		// Ex - Data - buf, Data len - data_len
 		if(data_len < 0) {
