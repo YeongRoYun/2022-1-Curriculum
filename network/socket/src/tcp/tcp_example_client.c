@@ -58,6 +58,7 @@ int main(int argc, char * argv[]) {
 			break;
 		}
 		printf("Receiving : %s\n", buf);
+		break;
 	}
 	close(sockfd);
 	return 0;

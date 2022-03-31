@@ -82,7 +82,7 @@ int main(int argc, char * argv[]) {
 			printf("Send Error\n");
 			break;
 		}
-		close(connfd);
+		break;
 	}
 	close(sockfd);
 	return 0;
