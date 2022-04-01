@@ -209,15 +209,16 @@
       int socket(domain, AF_RAW, protocol);
       '''
       - protocol
-	```
-	<netinet/in.h>
-	```
-	
-        * reference(https://www.ibm.com/docs/en/i/7.4?topic=ssw_ibm_i_74/apis/socket.htm#HDRSCKUS)
-	* protocol number can be any except for IPPROTO_TCP and IPPROTO_UDP
-	* Each raw socket is associated with one IP protocol number, and receives all data for that protocol.
-	* 0 (IPPROTO_IP) is specified, IP sends all data received from all the protocol numbers except IPPROTO_TCP and IPPROTO_UDP.
-	* 255 (IPPROTO_RAW) is specified, a user must ensure that the IP header data is included in th data sent out on an output operation 
-   
-   
-   2. 
+   	```
+   	<netinet/in.h>
+   	```
+   2. How to use 
+      * reference(https://www.ibm.com/docs/en/i/7.4?topic=ssw_ibm_i_74/apis/socket.htm#HDRSCKUS, https://man7.org/linux/man-pages/man7/raw.7.html)
+      * protocol number can be any except for IPPROTO_TCP and IPPROTO_UDP
+      * Each raw socket is associated with one IP protocol number, and receives all data for that protocol.
+      * 0 (IPPROTO_IP) is specified, IP sends all data received from all the protocol numbers except IPPROTO_TCP and IPPROTO_UDP.
+      * 255 (IPPROTO_RAW) is specified, a user must ensure that the IP header data is included in th data sent out on an output operation 
+   3. Communicatable Conditions
+      * same protocol number except IPPROTO_IP, IPPROTO_TCP, IPPROTO_UDP
+      * binding raw socket at client
+      * connect raw socket with server socket
