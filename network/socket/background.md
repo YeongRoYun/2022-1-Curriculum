@@ -215,6 +215,7 @@
    2. How to use 
       * reference(https://www.ibm.com/docs/en/i/7.4?topic=ssw_ibm_i_74/apis/socket.htm#HDRSCKUS, https://man7.org/linux/man-pages/man7/raw.7.html)
       * protocol number can be any except for IPPROTO_TCP and IPPROTO_UDP
+      * TCP/UDP protocol can be sent, but not be recieved by raw socket. Wanting it, Packet must be read at Link Layer
       * Each raw socket is associated with one IP protocol number, and receives all data for that protocol.
       * 0 (IPPROTO_IP) is specified, IP sends all data received from all the protocol numbers except IPPROTO_TCP and IPPROTO_UDP.
       * 255 (IPPROTO_RAW) is specified, a user must ensure that the IP header data is included in th data sent out on an output operation 
