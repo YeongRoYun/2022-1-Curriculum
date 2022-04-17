@@ -1,4 +1,4 @@
 # Definition
 
 - Validity: Syntactic Correctness
-- Completeness: \all
+- Completeness: $\all$
