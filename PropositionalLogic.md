@@ -1,1 +1,4 @@
+# Definition
 
+## Validity
+| Syntactic Correctness
